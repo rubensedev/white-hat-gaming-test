@@ -1,5 +1,6 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+
 import {
   catchError,
   Observable,
@@ -10,28 +11,40 @@ import {
   timer,
 } from 'rxjs';
 
+import { Store } from '../../store';
+
+import { Game } from '../_models/game.model';
+
 @Injectable()
 export class GamesService {
-  private games: {}[] = [];
+  private games: Game[] = [];
+
   private readonly http = inject(HttpClient);
   private readonly API_URL =
     'https://stage.whgstage.com/front-end-test/games.php';
   private readonly RETRY_COUNT = 2;
   private readonly RETRY_DELAY_MS = 2500;
 
-  read(): Observable<{}[]> {
+  private readonly store: Store = inject(Store);
+
+  games$: Observable<Game[]> = this.http.get<Game[]>(this.API_URL).pipe(
+    tap((data) => {
+      const games = data || [];
+      this.store.set({ games });
+    }),
+    retry({
+      count: this.RETRY_COUNT,
+      delay: (attemp) => timer(this.RETRY_DELAY_MS * attemp),
+    }),
+    catchError(this.handleError)
+  );
+
+  read(): Observable<Game[]> {
     if (this.games.length) {
       return of(this.games);
     }
 
-    return this.http.get<{}[]>(this.API_URL).pipe(
-      tap((games) => (this.games = games)),
-      retry({
-        count: this.RETRY_COUNT,
-        delay: (attemp) => timer(this.RETRY_DELAY_MS * attemp),
-      }),
-      catchError(this.handleError)
-    );
+    return this.games$;
   }
 
   private handleError(err: HttpErrorResponse): Observable<never> {

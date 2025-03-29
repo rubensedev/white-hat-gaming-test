@@ -6,6 +6,8 @@ import { take } from 'rxjs';
 
 import { GamesService } from './_services/games.service';
 
+import { Game } from './_models/game.model';
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -20,7 +22,7 @@ import { GamesService } from './_services/games.service';
   styles: ``,
 })
 export class AppComponent implements OnInit {
-  games!: {}[];
+  games!: Game[];
 
   constructor(private readonly gamesService: GamesService) {}
 
