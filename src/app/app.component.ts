@@ -1,35 +1,28 @@
-import { Component, OnInit } from '@angular/core';
-import { JsonPipe } from '@angular/common';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
-import { take } from 'rxjs';
+import { AppNavComponent } from './components/app-nav/app-nav.component';
+
+import { Store } from '../store';
 
 import { GamesService } from './_services/games.service';
-
-import { Game } from './_models/game.model';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   providers: [GamesService],
-  imports: [RouterOutlet, JsonPipe],
+  imports: [RouterOutlet, AppNavComponent],
   template: `
     <div class="app">
-      <h1>It works!</h1>
-      <div>{{ games | json }}</div>
+      <app-nav></app-nav>
+      <div class="wrapper"></div>
     </div>
   `,
   styles: ``,
 })
-export class AppComponent implements OnInit {
-  games!: Game[];
-
-  constructor(private readonly gamesService: GamesService) {}
-
-  ngOnInit(): void {
-    this.gamesService
-      .read()
-      .pipe(take(1))
-      .subscribe((games) => (this.games = games));
-  }
+export class AppComponent {
+  constructor(
+    private readonly store: Store,
+    private readonly gamesService: GamesService
+  ) {}
 }

@@ -1,0 +1,23 @@
+.app-nav {
+  background-color: #373737;
+  .wrapper {
+    max-width: 92%;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: 20px;
+    a {
+      height: 50px;
+      padding-inline: 12px;
+      display: flex;
+      align-items: center;
+      color: #ffffff;
+      &:hover,
+      &.active {
+        background-color: #8dc63f;
+      }
+    }
+  }
+}
