@@ -1,28 +1,31 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
 
+// Containers
+import { GamesComponent } from './containers/games/games.component';
+
+// Components
 import { AppNavComponent } from './components/app-nav/app-nav.component';
-
-import { Store } from '../store';
-
-import { GamesService } from './_services/games.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  providers: [GamesService],
-  imports: [RouterOutlet, AppNavComponent],
+  imports: [AppNavComponent, GamesComponent],
   template: `
     <div class="app">
       <app-nav></app-nav>
-      <div class="wrapper"></div>
+      <div class="wrapper">
+        <games></games>
+      </div>
     </div>
   `,
-  styles: ``,
+  styles: `
+    .app {
+      .wrapper {
+        max-width: 1300px;
+        margin: 0 auto;
+        padding: 30px;
+      }
+    }
+  `,
 })
-export class AppComponent {
-  constructor(
-    private readonly store: Store,
-    private readonly gamesService: GamesService
-  ) {}
-}
+export class AppComponent {}

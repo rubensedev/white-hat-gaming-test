@@ -1,0 +1,111 @@
+.game {
+  width: 225px;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  border-radius: 12px;
+  img {
+    border-radius: 12px;
+    transition: transform 0.3s ease;
+  }
+
+  .game-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 0 0 12px 12px;
+    padding: 15px 10px;
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.8) 0%,
+      rgba(0, 0, 0, 0.4) 60%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    z-index: 2;
+    .play-btn {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 44px;
+      height: 44px;
+      margin-bottom: 8px;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      &::after {
+        content: "";
+        border-style: solid;
+        border-width: 8px 0 8px 14px;
+        border-color: transparent transparent transparent #373737;
+        margin-left: 3px;
+      }
+    }
+
+    .game-name {
+      color: #ffffff;
+      font-weight: bold;
+      font-size: 14px;
+      text-align: center;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+      max-width: 90%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  &:hover {
+    img {
+      transform: scale(1.05);
+      border-radius: 12px;
+    }
+
+    .game-overlay {
+      transform: translateY(0);
+    }
+  }
+
+  &.new::after,
+  &.top::before {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 150px;
+    height: 30px;
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 16px;
+    text-align: center;
+    top: 10px;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    letter-spacing: 1px;
+    z-index: 3;
+  }
+
+  &.new {
+    &::after {
+      content: "NEW";
+      background-color: #8dc63f;
+      transform: rotate(45deg);
+      right: -50px;
+    }
+  }
+
+  &.top {
+    &::before {
+      content: "TOP";
+      background-color: #e74c3c;
+      transform: rotate(-45deg);
+      left: -50px;
+    }
+  }
+}
