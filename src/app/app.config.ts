@@ -4,8 +4,10 @@ import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 
+// Helpers
 import { INITIAL_STATE } from './_helpers/injection-tokes';
 import { StoreFactory } from './_helpers/factory-functions';
+import { INITIAL_STATE_VALUE } from './_helpers/initial-state-value';
 
 import { Store } from '../store';
 
@@ -16,7 +18,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(),
     {
       provide: INITIAL_STATE,
-      useValue: {},
+      useValue: INITIAL_STATE_VALUE,
     },
     {
       provide: Store,

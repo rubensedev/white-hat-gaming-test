@@ -1,24 +1,15 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 
-import {
-  catchError,
-  Observable,
-  of,
-  retry,
-  tap,
-  throwError,
-  timer,
-} from 'rxjs';
+import { catchError, Observable, retry, tap, throwError, timer } from 'rxjs';
 
 import { Store } from '../../store';
 
+// Models
 import { Game } from '../_models/game.model';
 
 @Injectable()
 export class GamesService {
-  private games: Game[] = [];
-
   private readonly http = inject(HttpClient);
   private readonly API_URL =
     'https://stage.whgstage.com/front-end-test/games.php';
@@ -38,14 +29,6 @@ export class GamesService {
     }),
     catchError(this.handleError)
   );
-
-  read(): Observable<Game[]> {
-    if (this.games.length) {
-      return of(this.games);
-    }
-
-    return this.games$;
-  }
 
   private handleError(err: HttpErrorResponse): Observable<never> {
     const errorMsg =
