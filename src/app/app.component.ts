@@ -1,7 +1,5 @@
 import { Component } from '@angular/core';
-
-// Containers
-import { GamesComponent } from './containers/games/games.component';
+import { RouterOutlet } from '@angular/router';
 
 // Components
 import { AppNavComponent } from './components/app-nav/app-nav.component';
@@ -9,12 +7,12 @@ import { AppNavComponent } from './components/app-nav/app-nav.component';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [AppNavComponent, GamesComponent],
+  imports: [RouterOutlet, AppNavComponent],
   template: `
     <div class="app">
       <app-nav></app-nav>
       <div class="wrapper">
-        <games></games>
+        <router-outlet></router-outlet>
       </div>
     </div>
   `,
