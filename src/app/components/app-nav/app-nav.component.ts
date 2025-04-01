@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  ViewChild,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -8,7 +13,7 @@ import { RouterLink } from '@angular/router';
   imports: [RouterLink],
   template: `
     <div class="app-nav">
-      <div class="wrapper">
+      <div #wrapper class="wrapper">
         <a [routerLink]="['/games', 'top']" routerLinkActive="active">
           Top Games
         </a>
@@ -38,8 +43,22 @@ import { RouterLink } from '@angular/router';
           Other
         </a>
       </div>
+
+      <div #hamburguer class="hamburger" (click)="toggleMenu()">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </div>
     </div>
   `,
   styleUrl: './app-nav.component.scss',
 })
-export class AppNavComponent {}
+export class AppNavComponent {
+  @ViewChild('hamburguer') hamburguer!: ElementRef;
+  @ViewChild('wrapper') wrapper!: ElementRef;
+
+  toggleMenu() {
+    this.hamburguer.nativeElement.classList.toggle('active');
+    this.wrapper.nativeElement.classList.toggle('active');
+  }
+}
