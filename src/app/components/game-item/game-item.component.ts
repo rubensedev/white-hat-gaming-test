@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { CurrencyPipe, NgClass, NgIf } from '@angular/common';
 
 // Models
@@ -7,10 +7,11 @@ import { GameWithJackpot } from '../../_models/game-with-jackpot.model';
 
 @Component({
   selector: 'game-item',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [NgClass, NgIf, CurrencyPipe],
-  templateUrl: './game.component.html',
-  styleUrl: './game.component.scss',
+  templateUrl: './game-item.component.html',
+  styleUrl: './game-item.component.scss',
 })
 export class GameItemComponent {
   @Input() game!: GameWithJackpot | null;

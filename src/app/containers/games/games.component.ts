@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { AsyncPipe, NgForOf, NgIf } from '@angular/common';
 
 import {
@@ -18,7 +18,7 @@ import { GamesService } from '../../_services/games.service';
 import { JackpotsService } from '../../_services/jackpots.service';
 
 // Components
-import { GameItemComponent } from '../../components/game/game.component';
+import { GameItemComponent } from '../../components/game-item/game-item.component';
 
 // Models
 import { Game } from '../../_models/game.model';
@@ -27,6 +27,7 @@ import { GameWithJackpot } from '../../_models/game-with-jackpot.model';
 
 @Component({
   selector: 'games',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   providers: [GamesService, JackpotsService],
   imports: [GameItemComponent, NgIf, NgForOf, AsyncPipe],
@@ -35,7 +36,10 @@ import { GameWithJackpot } from '../../_models/game-with-jackpot.model';
       <div *ngIf="isLoading">Loading games...</div>
       <div *ngIf="!isLoading && !games.length">No games in this category</div>
 
-      <game-item *ngFor="let game of games" [game]="game"></game-item>
+      <game-item
+        *ngFor="let game of games; trackBy: trackById"
+        [game]="game"
+      ></game-item>
     </div>
   `,
   styles: `
@@ -76,6 +80,10 @@ export class GamesComponent implements OnInit {
     ]).pipe(
       map(([games, jackpots]) => this.mergeGamesWithJackpots(games, jackpots))
     );
+  }
+
+  trackById(id: number, value: GameWithJackpot): string {
+    return value.id;
   }
 
   private mergeGamesWithJackpots(
