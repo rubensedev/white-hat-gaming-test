@@ -1,8 +1,8 @@
 <div class="game" [ngClass]="customClass(game?.categories)">
   <img [src]="game?.image" [alt]="game?.name" />
-  <!-- <div *ngIf="game?.jackpot" class="game-jackpot-ribbon">
+  <div *ngIf="game?.jackpot" class="game-jackpot-ribbon">
     {{ game?.jackpot | currency : "GBP" : "symbol" : "1.0-0" }}
-  </div> -->
+  </div>
   <div class="game-overlay">
     <div class="play-btn"></div>
     <div class="game-name">{{ game?.name }}</div>

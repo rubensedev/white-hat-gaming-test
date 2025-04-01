@@ -1,13 +1,23 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { AsyncPipe, NgForOf, NgIf } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 
-import { map, Observable, switchMap, take, tap } from 'rxjs';
+import {
+  combineLatest,
+  interval,
+  map,
+  Observable,
+  startWith,
+  switchMap,
+  take,
+  tap,
+} from 'rxjs';
 
 import { Store } from '../../../store';
 
 // Services
 import { GamesService } from '../../_services/games.service';
+import { JackpotsService } from '../../_services/jackpots.service';
 
 // Components
 import { GameItemComponent } from '../../components/game-item/game-item.component';
@@ -15,12 +25,14 @@ import { GameItemComponent } from '../../components/game-item/game-item.componen
 // Models
 import { Game } from '../../_models/game.model';
 import { GameCategory } from '../../_models/game-category.model';
+import { Jackpot } from '../../_models/jackpot.model';
+import { GameWithJackpot } from '../../_models/game-with-jackpot.model';
 
 @Component({
   selector: 'games',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  providers: [GamesService],
+  providers: [GamesService, JackpotsService],
   imports: [GameItemComponent, NgIf, NgForOf, AsyncPipe],
   template: `
     <div class="games" *ngIf="games$ | async as games">
@@ -47,12 +59,13 @@ export class GamesComponent implements OnInit {
   isLoading = true;
   routeId!: GameCategory['id'];
 
-  games$!: Observable<Game[]>;
+  games$!: Observable<GameWithJackpot[]>;
 
   constructor(
     private readonly route: ActivatedRoute,
     private readonly store: Store,
-    private readonly gamesService: GamesService
+    private readonly gamesService: GamesService,
+    private readonly jackpotsService: JackpotsService
   ) {}
 
   ngOnInit(): void {
@@ -60,27 +73,48 @@ export class GamesComponent implements OnInit {
       .pipe(take(1))
       .subscribe(() => (this.isLoading = false));
 
+    interval(3000)
+      .pipe(
+        startWith(0),
+        switchMap(() => this.jackpotsService.jackpots$)
+      )
+      .subscribe();
+
     this.games$ = this.route.paramMap.pipe(
-      map((params) => params.get('id')),
+      map((params: ParamMap) => params.get('id')),
       tap((routeId: any) => (this.routeId = routeId)),
-      switchMap((routeId: any) => {
-        const otherCategories: GameCategory['id'][] = [
-          'ball',
-          'virtual',
-          'fun',
-        ];
-        return this.store.selectState('games').pipe(
-          map((games) => {
-            if (routeId === 'other') {
-              return games.filter((game) =>
-                otherCategories.some((cat) => game.categories.includes(cat))
-              );
-            }
-            return games.filter((game) => game.categories.includes(routeId));
+      switchMap((routeId) =>
+        combineLatest([
+          this.store.selectState('games'),
+          this.store.selectState('jackpots'),
+        ]).pipe(
+          map(([games, jackpots]) => {
+            const filteredGames = this.filterByCategories(routeId, games);
+            return this.mergeGamesWithJackpots(filteredGames, jackpots);
           })
-        );
-      })
+        )
+      )
     );
+  }
+
+  private filterByCategories(routeId: any, games: Game[]): Game[] {
+    const otherCategories: GameCategory['id'][] = ['ball', 'virtual', 'fun'];
+    if (routeId === 'other') {
+      return games.filter((game) =>
+        otherCategories.some((cat) => game.categories.includes(cat))
+      );
+    }
+    return games.filter((game) => game.categories.includes(routeId));
+  }
+
+  private mergeGamesWithJackpots(
+    games: Game[],
+    jackpots: Jackpot[]
+  ): GameWithJackpot[] {
+    return games.map((game) => {
+      const jackpot = jackpots.find((j) => j.game === game.id);
+      return { ...game, jackpot: jackpot ? jackpot.amount : null };
+    });
   }
 
   trackById(id: number, value: Game): string {

@@ -1,20 +1,20 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { NgClass } from '@angular/common';
+import { CurrencyPipe, NgClass, NgIf } from '@angular/common';
 
 // Models
-import { Game } from '../../_models/game.model';
 import { GameCategory } from '../../_models/game-category.model';
+import { GameWithJackpot } from '../../_models/game-with-jackpot.model';
 
 @Component({
   selector: 'game-item',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [NgClass],
+  imports: [NgClass, NgIf, CurrencyPipe],
   templateUrl: './game-item.component.html',
   styleUrl: './game-item.component.scss',
 })
 export class GameItemComponent {
-  @Input() game!: Game | null;
+  @Input() game!: GameWithJackpot | null;
   @Input() routeId!: GameCategory['id'];
 
   customClass(categories: GameCategory['id'][] | undefined) {
