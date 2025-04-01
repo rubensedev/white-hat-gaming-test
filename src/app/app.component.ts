@@ -21,7 +21,7 @@ import { AppNavComponent } from './components/app-nav/app-nav.component';
       .wrapper {
         max-width: 1300px;
         margin: 0 auto;
-        padding: 30px;
+        padding: 30px 40px;
       }
     }
   `,

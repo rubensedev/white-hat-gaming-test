@@ -36,10 +36,10 @@ import { GameCategory } from '../../_models/game-category.model';
   `,
   styles: `
     .games {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 25px 15px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(225px, 1fr));
+      justify-items: center;
+      gap: 40px 8px;
     }
   `,
 })
