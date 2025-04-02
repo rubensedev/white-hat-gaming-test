@@ -1,15 +1,19 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import { AsyncPipe, NgForOf, NgIf } from '@angular/common';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 
 import {
   combineLatest,
-  interval,
   map,
   Observable,
-  startWith,
+  Subject,
   switchMap,
-  take,
+  takeUntil,
   tap,
 } from 'rxjs';
 
@@ -55,11 +59,13 @@ import { GameWithJackpot } from '../../_models/game-with-jackpot.model';
     }
   `,
 })
-export class GamesComponent implements OnInit {
+export class GamesComponent implements OnInit, OnDestroy {
   isLoading = true;
   routeId!: GameCategory['id'];
 
   games$!: Observable<GameWithJackpot[]>;
+
+  private destroy$ = new Subject<void>();
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -70,15 +76,10 @@ export class GamesComponent implements OnInit {
 
   ngOnInit(): void {
     this.gamesService.games$
-      .pipe(take(1))
+      .pipe(takeUntil(this.destroy$))
       .subscribe(() => (this.isLoading = false));
 
-    interval(3000)
-      .pipe(
-        startWith(0),
-        switchMap(() => this.jackpotsService.jackpots$)
-      )
-      .subscribe();
+    this.jackpotsService.jackpots$.pipe(takeUntil(this.destroy$)).subscribe();
 
     this.games$ = this.route.paramMap.pipe(
       map((params: ParamMap) => params.get('id')),
@@ -93,7 +94,8 @@ export class GamesComponent implements OnInit {
             return this.mergeGamesWithJackpots(filteredGames, jackpots);
           })
         )
-      )
+      ),
+      takeUntil(this.destroy$)
     );
   }
 
@@ -119,5 +121,10 @@ export class GamesComponent implements OnInit {
 
   trackById(id: number, value: Game): string {
     return value.id;
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

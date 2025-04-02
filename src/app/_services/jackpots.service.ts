@@ -1,7 +1,16 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 
-import { catchError, Observable, retry, tap, throwError, timer } from 'rxjs';
+import {
+  catchError,
+  Observable,
+  retry,
+  shareReplay,
+  switchMap,
+  tap,
+  throwError,
+  timer,
+} from 'rxjs';
 
 import { Store } from '../../store';
 
@@ -18,19 +27,19 @@ export class JackpotsService {
 
   private readonly store: Store = inject(Store);
 
-  jackpots$: Observable<Jackpot[]> = this.http
-    .get<Jackpot[]>(this.API_URL)
-    .pipe(
-      tap((data) => {
-        const jackpots = data || [];
-        this.store.set({ jackpots });
-      }),
-      retry({
-        count: this.RETRY_COUNT,
-        delay: (attempt) => timer(this.RETRY_DELAY_MS * attempt),
-      }),
-      catchError(this.handleError)
-    );
+  jackpots$: Observable<Jackpot[]> = timer(0, 3000).pipe(
+    switchMap(() => this.http.get<Jackpot[]>(this.API_URL)),
+    tap((data) => {
+      const jackpots = data || [];
+      this.store.set({ jackpots });
+    }),
+    retry({
+      count: this.RETRY_COUNT,
+      delay: (attempt) => timer(this.RETRY_DELAY_MS * attempt),
+    }),
+    catchError(this.handleError),
+    shareReplay(1)
+  );
 
   private handleError(err: HttpErrorResponse): Observable<never> {
     const errorMsg =
